@@ -53,3 +53,9 @@ class MemoryManager:
                 task_objects.append(t)
 
             return task_objects
+
+    def reset_database(self):
+        """Temp function that Wipes all tasks from the database."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("DELETE FROM tasks")
+        print("🧹 Database has been reset!")

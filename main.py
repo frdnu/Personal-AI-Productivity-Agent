@@ -1,4 +1,4 @@
-from task import Task
+from classes.task import Task
 from storage.memory import MemoryManager
 
 memory = MemoryManager()
