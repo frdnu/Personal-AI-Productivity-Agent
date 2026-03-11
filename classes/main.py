@@ -1,18 +1,26 @@
 from task import Task
+from storage.memory import MemoryManager
+
+memory = MemoryManager()
 
 task1 = Task(
     title="Study Operating Systems",
     description="Prepare for midterm",
-    due_date="2026-03-01",
-    priority="high",
+    due_date="2026-03-20",
+    priority="high"
 )
 
-task2 = Task("Clean desk")
+task2 = Task(
+    title="Go to gym",
+    description="Leg day",
+    priority="medium"
+)
 
-print(task1)
-print(task2)
+memory.add_task(task1)
+memory.add_task(task2)
 
-task1.mark_done()
-print(task1)
+tasks = memory.get_tasks()
 
-print("Is task1 overdue?", task1.is_overDue())
+print("Tasks in database:")
+for task in tasks:
+    print(task)

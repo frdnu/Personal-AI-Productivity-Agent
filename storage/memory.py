@@ -1,46 +1,55 @@
 import sqlite3
+from classes.task import Task
 
 
 class MemoryManager:
-
     def __init__(self, db_path="data/tasks.db"):
         self.db_path = db_path
         self._create_table()
 
     def _create_table(self):
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS tasks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    description TEXT,
+                    priority TEXT,
+                    status TEXT,
+                    due_date TEXT,
+                    created_at TEXT
+                )
+            """)
 
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS tasks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                description TEXT,
-                priority TEXT,
-                status TEXT,
-                due_date TEXT,
-                created_at TEXT
-            )
-        """)
+    def add_task(self, task: Task):
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                INSERT INTO tasks (title, description, priority, status, due_date, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                task.title,
+                task.description,
+                task.priority,
+                task.status,
+                str(task.due_date) if task.due_date else None,
+                task.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            ))
 
-        conn.commit()
-        conn.close()
+    def get_tasks(self):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute(
+                "SELECT title, description, due_date, priority, status FROM tasks")
+            rows = cursor.fetchall()
 
-    def add_task(self, task):
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+            task_objects = []
+            for row in rows:
+                t = Task(
+                    title=row[0],
+                    description=row[1],
+                    due_date=row[2],
+                    priority=row[3]
+                )
+                t.status = row[4]
+                task_objects.append(t)
 
-        cursor.execute("""
-            INSERT INTO tasks (title, description, priority, status, due_date, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (
-            task.title,
-            task.description,
-            task.priority,
-            task.status,
-            str(task.due_date),
-            str(task.created_at)
-        ))
-
-        conn.commit()
-        conn.close()
+            return task_objects
