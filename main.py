@@ -1,26 +1,24 @@
 from classes.task import Task
 from storage.memory import MemoryManager
+from utils.parser import Parser
 
 memory = MemoryManager()
 
-task1 = Task(
-    title="Study Operating Systems",
-    description="Prepare for midterm",
-    due_date="2026-03-20",
-    priority="high"
+# 1. Simulate user input
+user_input = "Remind me to Fix the CSS at high priority due tomorrow"
+
+# 2. Parse the input into a dictionary
+data = Parser.parse_command(user_input)
+
+# 3. Create the object dynamically
+new_task = Task(
+    title=data['title'],
+    priority=data['priority'],
+    due_date=data['due_date']
 )
 
-task2 = Task(
-    title="Go to gym",
-    description="Leg day",
-    priority="medium"
-)
+# 4. Save to database
+memory.add_task(new_task)
 
-memory.add_task(task1)
-memory.add_task(task2)
-
-tasks = memory.get_tasks()
-
-print("Tasks in database:")
-for task in tasks:
-    print(task)
+print(
+    f"Added task: {new_task.title} (Priority: {new_task.priority}, Due: {new_task.due_date})")
